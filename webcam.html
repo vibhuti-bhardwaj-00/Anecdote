@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anecdote - Webcam</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .webcam-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            top: 0;
+            left: 0;
+            flex-direction: column;
+        }
+
+        #webcam-feed {
+            width: 640px;
+            height: 480px;
+            border: 5px solid white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.5);
+            background-color: black;
+            display: none;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            border: 1px solid #fff;
+            padding: 10px 25px;
+            color: #fff;
+            transition: 0.6s ease;
+            font-size: 18px;
+            text-decoration: none;
+            background: transparent;
+            cursor: pointer;
+            text-align: center;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background-color: #fff;
+            color: #000;
+        }
+
+        .turn-off-button {
+            margin-top: 10px;
+        }
+
+        .title {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+        }
+    </style>
+</head>
+<body onload="document.body.style.opacity='1'">
+    <header>
+        <div class="main">
+            <ul>
+                <li><a href="index.html"><i class="fa fa-home"></i> Home</a></li>
+                <li class="active"><a href="webcam.html"><i class="fa fa-camera"></i> Webcam</a></li>
+                <li><a href="more.html">More</a></li>
+            </ul>
+        </div>
+        <div class="title">
+            <h1>Webcam</h1>
+        </div>
+    </header>
+    
+    <section id="webcam-section" class="webcam-container">
+        <img id="webcam-feed" src="" alt="Webcam Feed">
+        <div class="button-container">
+            <button class="btn" id="start-btn">TURN ON</button>
+            <button class="btn turn-off-button" id="stop-btn">TURN OFF</button>
+        </div>
+    </section>
+    
+    <script>
+        document.getElementById("start-btn").addEventListener("click", function() {
+            fetch("http://127.0.0.1:5000/start_feed")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "started") {
+                        document.getElementById("webcam-feed").src = "http://127.0.0.1:5000/video_feed";
+                        document.getElementById("webcam-feed").style.display = "block";
+                    }
+                })
+                .catch(error => console.error("Error starting feed:", error));
+        });
+
+        document.getElementById("stop-btn").addEventListener("click", function() {
+            fetch("http://127.0.0.1:5000/stop_feed")
+                .then(response => response.json())
+                .then(() => {
+                    document.getElementById("webcam-feed").src = "";
+                    document.getElementById("webcam-feed").style.display = "none";
+                })
+                .catch(error => console.error("Error stopping feed:", error));
+        });
+    </script>
+</body>
+</html>

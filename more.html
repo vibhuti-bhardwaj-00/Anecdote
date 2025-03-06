@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>More - Anecdote</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Century Gothic', sans-serif;
+        }
+        
+        header{
+            height:3vh;
+            min-height: 50px;
+        }
+        body {
+            background: url('aa.jpg') no-repeat center center/cover;
+            background-attachment: fixed;
+            color: #f1f1f1;
+            font-size: 14px;
+            line-height: 1.4;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        header {
+            
+            position: relative;
+            padding-top: 10px; /* Space for navigation menu */
+        }
+
+        .main {
+            position: relative; /* Ensure it stays above other elements */
+            z-index: 1000; /* Higher value brings it to the front */
+        }
+        
+        ul{
+            float:right;
+            list-style-type: none;
+            margin-top: 30px;
+            margin-right:60px ;
+        }
+        ul li{
+            display: inline-block;
+        }
+        ul li a{
+            text-decoration: none;
+            color: #fff;
+            padding: 5px 20px;
+            border: 1px solid transparent;
+            transition: 0.5s ease;
+        
+        }
+        
+        ul li a:hover{
+            background-color: #fff;
+            color: #000;
+        }
+        
+        ul li.active a{
+        background-color:#fff;
+            color: #000;
+        
+        }
+
+        .content {
+            padding: 20px;
+            margin: 20px auto; /* Ensures spacing from navigation */
+            width: 90%;
+            text-align: center;
+            border-radius: 10px;
+            box-sizing: border-box;
+            background: rgba(0, 0, 0, 0.7); /* Transparent background for readability */
+        }
+
+        h1, h2 {
+            margin: 20px 0 10px; /* Equal vertical spacing for consistency */
+            color: rgb(119, 159, 223);
+        }
+
+        h1 {
+            font-size: 22px;
+        }
+
+        h2 {
+            font-size: 18px;
+        }
+
+        p, ul {
+            margin: 10px 0 20px; /* Spaced evenly from headings and other content */
+            font-size: 14px;
+            line-height: 1.6; /* Improved readability */
+            color: #ccc;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .content a {
+            color: rgb(0, 45, 117);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            background-color: #222;
+            color: #fff;
+            text-align: center;
+            padding: 8px 0;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="main">
+            <ul>
+                <li><a href="index.html"><i class="fa fa-home"></i> Home</a></li>
+                <li><a href="webcam.html"><i class="fa fa-camera"></i> Webcam</a></li>
+                <li class="active"><a href="more.html">More</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <section class="content">
+        <h1>More About Our Mission</h1>
+        <p>Welcome to the "More" page of our website! Here, we delve deeper into our mission, our work, and the impact
+            we aspire to create for blind and visually impaired individuals. Our goal is to make the world a more
+            accessible and inclusive place by combining innovative technology, practical resources, and a
+            community-driven approach to foster independence and confidence.</p>
+
+        <h2>Our Mission</h2>
+        <p>At the core of our work is a commitment to empowering blind and visually impaired individuals to navigate the
+            world with ease, independence, and safety. We believe that everyone deserves equal access to opportunities
+            and the ability to explore their surroundings without limitations.</p>
+
+        <h2>Challenges We Address</h2>
+        <ul>
+            <li>Navigating unfamiliar environments.</li>
+            <li>Identifying objects and obstacles.</li>
+            <li>Accessing information that is typically visual.</li>
+            <li>Reliance on traditional tools like canes or guide dogs, which have limitations.</li>
+        </ul>
+
+        <h2> Solutions...</h2>
+        <p>We leverage advanced technology and accessible design to provide practical, user-friendly tools. Here’s how we’re
+            making a difference:</p>
+        <ul>
+            <li><strong>Object Detection:</strong> Our systems identify objects and obstacles in real-time, ensuring safe
+                navigation in complex environments.</li>
+            <li><strong>Audio Feedback:</strong> By converting visual information into auditory cues, we help users "hear"
+                their surroundings and make informed decisions.</li>
+            <li><strong>Distance Measurement:</strong> Our tools calculate the proximity of objects to provide spatial
+                awareness and enhance mobility.</li>
+        </ul>
+
+        <h2>Why Accessibility Matters</h2>
+        <p>Accessibility is a fundamental right, not a privilege. By making the world more inclusive for blind and visually
+            impaired individuals, we’re creating opportunities for independence, mobility, and equality.</p>
+
+        <h2>Join Us in Making a Difference</h2>
+        <p>We invite you to be part of our journey toward a more inclusive world. Whether by exploring our solutions,
+            sharing our mission, or supporting our work, you can help us make a meaningful impact.</p>
+
+        <p>Thank you for being here and supporting our mission to empower blind and visually impaired individuals.
+            Together, we can create a world of equal opportunities and boundless possibilities.</p>
+    </section>
+
+    <footer>
+        <p>© 2025 Anecdote. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>
+
