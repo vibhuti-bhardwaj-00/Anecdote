@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Results - Object Detection</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Century Gothic', sans-serif;
+        }
+        
+        header{
+            height:3vh;
+            min-height: 50px;
+        }
+        body {
+            background: url('aa.jpg') no-repeat center center/cover;
+            background-attachment: fixed;
+            color: #f1f1f1;
+            font-size: 14px;
+            line-height: 1.4;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        header {
+            
+            position: relative;
+            padding-top: 10px; 
+        }
+
+        .main {
+            position: relative; 
+            z-index: 1000; 
+        }
+        
+        ul{
+            float:right;
+            list-style-type: none;
+            margin-top: 30px;
+            margin-right:60px ;
+        }
+        ul li{
+            display: inline-block;
+        }
+        ul li a{
+            text-decoration: none;
+            color: #fff;
+            padding: 5px 20px;
+            border: 1px solid transparent;
+            transition: 0.5s ease;
+        
+        }
+        
+        ul li a:hover{
+            background-color: #fff;
+            color: #000;
+        }
+        
+        ul li.active a{
+        background-color:#fff;
+            color: #000;
+        
+        }
+
+        .content {
+            padding: 20px;
+            margin: 20px auto; 
+            width: 90%;
+            text-align: center;
+            border-radius: 10px;
+            box-sizing: border-box;
+            background: rgba(0, 0, 0, 0.7); 
+        }
+
+        h1, h2 {
+            margin: 20px 0 10px; 
+            color: rgb(119, 159, 223);
+        }
+
+        h1 {
+            font-size: 22px;
+        }
+
+        h2 {
+            font-size: 18px;
+        }
+
+        p, ul {
+            margin: 10px 0 20px; 
+            font-size: 14px;
+            line-height: 1.6; 
+            color: #ccc;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .content a {
+            color: rgb(0, 45, 117);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            background-color: #222;
+            color: #fff;
+            text-align: center;
+            padding: 8px 0;
+            margin-top: 10px;
+        }
+
+        /* Table styling */
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #333;
+            border-radius: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #444;
+            color: #fff;
+        }
+
+        td {
+            color: #fff;
+        }
+
+        /* Button styling */
+        .pdf-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .pdf-btn:hover {
+            background-color: #45a049;
+        }
+
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="main">
+            <ul>
+                <li class="active"><a href="index.html"><i class="fa fa-home"></i> Home</a></li>
+                <li><a href="webcam.html"><i class="fa fa-camera"></i> Webcam</a></li>
+                <li><a href="nightvision.html"><i class="fa fa-moon-o"></i> Night Vision</a></li>
+                <li><a href="edge_detection.html"><i class="fa fa-line-chart"></i> Edge Detection</a></li>
+                <li><a href="more.html"><i class="fa fa-info-circle"></i> More</a></li>
+            </ul>
+        </div>
+    </header>
+
+<div class="content">
+    <h1>Live Detected Objects</h1>
+    <table id="detection-table">
+        <thead>
+            <tr>
+                <th>Object</th>
+                <th>Distance (cm)</th>
+                <th>Mode</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data rows will be inserted here dynamically -->
+        </tbody>
+    </table>
+</div>
+
+
+    <script>
+        async function fetchResults() {
+            try {
+                const response = await fetch('/results');
+                const data = await response.json();
+
+                const tableBody = document.querySelector('#detection-table tbody');
+                tableBody.innerHTML = ''; // Clear previous entries
+
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.object}</td>
+                        <td>${item.distance}</td>
+                        <td>${item.mode}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching detection results:', error);
+            }
+        }
+
+        
+        setInterval(fetchResults, 2000);
+        fetchResults(); 
+    </script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anecdote - Edge Detection</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .webcam-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            top: 0;
+            left: 0;
+            flex-direction: column;
+        }
+
+        #edge-feed {
+            width: 640px;
+            height: 480px;
+            border: 5px solid white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.5);
+            background-color: black;
+            display: none;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            border: 1px solid #fff;
+            padding: 10px 25px;
+            color: #fff;
+            transition: 0.6s ease;
+            font-size: 18px;
+            text-decoration: none;
+            background: transparent;
+            cursor: pointer;
+            text-align: center;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background-color: #fff;
+            color: #000;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #222;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(255,255,255,0.2);
+            z-index: 1;
+            border-radius: 6px;
+        }
+
+        .dropdown-content a {
+            color: white;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid #555;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #555;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .turn-off-button {
+            margin-top: 10px;
+        }
+
+        .title {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+        }
+    </style>
+</head>
+<body onload="document.body.style.opacity='1'">
+    <header>
+        <div class="main">
+            <ul>
+                <li class="active"><a href="index.html"><i class="fa fa-home"></i> Home</a></li>
+                <li><a href="webcam.html"><i class="fa fa-camera"></i> Webcam</a></li>
+                <li><a href="nightvision.html"><i class="fa fa-moon-o"></i> Night Vision</a></li>
+                <li><a href="edge_detection.html"><i class="fa fa-line-chart"></i> Edge Detection</a></li>
+                <li><a href="http://127.0.0.1:5000/generate_pdf"><i class="fa fa-info-circle"></i> Generate PDF</a></li>
+                <li><a href="more.html"><i class="fa fa-info-circle"></i> More</a></li>
+            </ul>
+        </div>
+        <div class="title">
+            <h1>Edge Detection</h1>
+        </div>
+    </header>
+
+
+     <main>
+    
+       
+        <section id="generate-pdf-section">
+            <a href="http://127.0.0.1:5000/generate_pdf">
+                
+            </a>
+        </section>
+    </main>
+    
+    <section id="edge-section" class="webcam-container">
+        <img id="edge-feed" src="" alt="Edge Detection Feed">
+        <div class="button-container">
+            <div class="dropdown">
+                <button class="btn">TURN ON EDGE DETECTION</button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="startEdgeDetection('canny')">Canny</a>
+                    <a href="#" onclick="startEdgeDetection('log')">Laplacian of Gaussian</a>
+                    <a href="#" onclick="startEdgeDetection('sobel')">Sobel Operator</a>
+                </div>
+            </div>
+            <button class="btn turn-off-button" id="stop-edge-btn">TURN OFF</button>
+        </div>
+    </section>
+    
+    <script>
+        function startEdgeDetection(mode) {
+            fetch(`http://127.0.0.1:5000/start_edge_detection?mode=${mode}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "started") {
+                        document.getElementById("edge-feed").src = `http://127.0.0.1:5000/video_feed_edge?mode=${mode}`;
+                        document.getElementById("edge-feed").style.display = "block";
+                    }
+                })
+                .catch(error => console.error("Error starting edge detection:", error));
+        }
+
+        document.getElementById("stop-edge-btn").addEventListener("click", function() {
+            fetch("http://127.0.0.1:5000/stop_feed")
+                .then(response => response.json())
+                .then(() => {
+                    document.getElementById("edge-feed").src = "";
+                    document.getElementById("edge-feed").style.display = "none";
+                })
+                .catch(error => console.error("Error stopping edge detection:", error));
+        });
+    </script>
+</body>
+</html>
+

@@ -29,12 +29,12 @@
         header {
             
             position: relative;
-            padding-top: 10px; /* Space for navigation menu */
+            padding-top: 10px; 
         }
 
         .main {
-            position: relative; /* Ensure it stays above other elements */
-            z-index: 1000; /* Higher value brings it to the front */
+            position: relative; 
+            z-index: 1000; 
         }
         
         ul{
@@ -68,16 +68,16 @@
 
         .content {
             padding: 20px;
-            margin: 20px auto; /* Ensures spacing from navigation */
+            margin: 20px auto; 
             width: 90%;
             text-align: center;
             border-radius: 10px;
             box-sizing: border-box;
-            background: rgba(0, 0, 0, 0.7); /* Transparent background for readability */
+            background: rgba(0, 0, 0, 0.7); 
         }
 
         h1, h2 {
-            margin: 20px 0 10px; /* Equal vertical spacing for consistency */
+            margin: 20px 0 10px; 
             color: rgb(119, 159, 223);
         }
 
@@ -90,9 +90,9 @@
         }
 
         p, ul {
-            margin: 10px 0 20px; /* Spaced evenly from headings and other content */
+            margin: 10px 0 20px; 
             font-size: 14px;
-            line-height: 1.6; /* Improved readability */
+            line-height: 1.6; 
             color: #ccc;
         }
 
@@ -125,12 +125,25 @@
     <header>
         <div class="main">
             <ul>
-                <li><a href="index.html"><i class="fa fa-home"></i> Home</a></li>
+                <li class="active"><a href="index.html"><i class="fa fa-home"></i> Home</a></li>
                 <li><a href="webcam.html"><i class="fa fa-camera"></i> Webcam</a></li>
-                <li class="active"><a href="more.html">More</a></li>
+                <li><a href="nightvision.html"><i class="fa fa-moon-o"></i> Night Vision</a></li>
+                <li><a href="edge_detection.html"><i class="fa fa-line-chart"></i> Edge Detection</a></li>
+                <li><a href="http://127.0.0.1:5000/generate_pdf"><i class="fa fa-info-circle"></i> Generate PDF</a></li>
+                <li><a href="more.html"><i class="fa fa-info-circle"></i> More</a></li>
             </ul>
         </div>
     </header>
+
+     <main>
+    
+       
+        <section id="generate-pdf-section">
+            <a href="http://127.0.0.1:5000/generate_pdf">
+                
+            </a>
+        </section>
+    </main>
 
     <section class="content">
         <h1>More About Our Mission</h1>

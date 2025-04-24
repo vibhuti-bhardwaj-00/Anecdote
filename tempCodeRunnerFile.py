@@ -4,52 +4,48 @@ import cv2
 import time
 import os
 from gtts import gTTS
-from ultralytics import YOLO
+from ultralytics import YOLO 
+from flask import request
+import numpy as np
+
 
 app = Flask(__name__)
-CORS(app)  # Allow frontend requests
+CORS(app)
 
-# Load YOLOv8 model
 model = YOLO('/Users/vibhutibhardwaj/runs/detect/train4/weights/best.pt')
 
-# Distance estimation parameters
-KNOWN_WIDTH = 7.0  # Known object width in cm
-FOCAL_LENGTH = 1428.57  # Focal length of camera
+KNOWN_WIDTH = 7.0  
+FOCAL_LENGTH = 1671.43  
 
-# Language settings
 LANGUAGE_MAP = {"English": "en", "Hindi": "hi", "French": "fr", "Spanish": "es", "German": "de"}
-SELECTED_LANGUAGE = "English"  # Default language
+SELECTED_LANGUAGE = "English"
 
-# Global variables
 camera = None
 streaming = False
 
-# Function to estimate distance
 def estimate_distance(known_width, focal_length, pixel_width):
     return (known_width * focal_length / pixel_width) if pixel_width > 0 else 0
 
-# Function to generate speech for detected object
 def speak(text, lang="en"):
     try:
         print(f"🔊 Speaking: {text} in {lang}")
         tts = gTTS(text=text, lang=lang)
         tts.save("output.mp3")
-        os.system("afplay output.mp3")  # macOS
+        os.system("afplay output.mp3") 
     except Exception as e:
         print(f"❌ Error in speech synthesis: {e}")
 
-# Function to process video frames and generate continuous audio
 def generate_frames():
     global camera, streaming
     last_spoken_time = time.time()
-    min_speak_interval = 3  # Speak once every 3 seconds
+    min_speak_interval = 3  
 
     while streaming:
         success, frame = camera.read()
         if not success:
             break
 
-        results = model(frame)  # Run YOLO detection
+        results = model(frame)  
         nearest_object = None
         min_distance = float('inf')
 
@@ -64,30 +60,160 @@ def generate_frames():
 
                 if distance < min_distance and distance > 0:
                     min_distance = distance
-                    nearest_object = class_name
+                    nearest_object = (class_name, x1, y1, x2, y2)
 
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.putText(frame, f"{class_name}: {distance:.2f} cm", (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
 
-        # Speak nearest object at controlled intervals
         if nearest_object and (time.time() - last_spoken_time > min_speak_interval):
-            spoken_text = f"{nearest_object} detected at {int(min_distance)} centimeters"
+            class_name, x1, y1, x2, y2 = nearest_object
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)  
+            cv2.putText(frame, f"Closest: {class_name} ({min_distance:.2f} cm)", (x1, y1 - 20),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+            spoken_text = f"{class_name} detected at {int(min_distance)} centimeters"
             speak(spoken_text, LANGUAGE_MAP[SELECTED_LANGUAGE])
             last_spoken_time = time.time()
 
-        # Encode and stream frame
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-# Start and Stop Feed Routes
+def generate_frames_night(mode):
+    global camera, streaming
+    last_spoken_time = time.time()
+    min_speak_interval = 3  
+
+    while streaming:
+        success, frame = camera.read()
+        if not success:
+            break
+
+      
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        if mode == 'clahe':
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+            enhanced_gray = clahe.apply(gray)
+        elif mode == 'gamma':
+            gamma = 1.5  
+            enhanced_gray = cv2.convertScaleAbs(gray, alpha=1, beta=gamma)
+        elif mode == 'histogram':
+            enhanced_gray = cv2.equalizeHist(gray)
+
+        enhanced_frame = cv2.cvtColor(enhanced_gray, cv2.COLOR_GRAY2BGR)
+
+        
+        results = model(enhanced_frame)
+        nearest_object = None
+        min_distance = float('inf')
+
+        for result in results:
+            for box in result.boxes:
+                x1, y1, x2, y2 = map(int, box.xyxy[0])
+                pixel_width = x2 - x1
+                distance = estimate_distance(KNOWN_WIDTH, FOCAL_LENGTH, pixel_width)
+                class_id = int(box.cls[0])
+                class_name = model.names[class_id]
+
+                
+                if distance < min_distance and distance > 0:
+                    min_distance = distance
+                    nearest_object = (class_name, x1, y1, x2, y2)
+
+                
+                cv2.rectangle(enhanced_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.putText(enhanced_frame, f"{class_name}: {distance:.2f} cm", (x1, y1 - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+
+        
+        if nearest_object and (time.time() - last_spoken_time > min_speak_interval):
+            class_name, x1, y1, x2, y2 = nearest_object
+            spoken_text = f"{class_name} detected at {int(min_distance)} centimeters"
+            speak(spoken_text, LANGUAGE_MAP[SELECTED_LANGUAGE])
+            last_spoken_time = time.time()
+
+        
+        ret, buffer = cv2.imencode('.jpg', enhanced_frame)
+        frame = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+def generate_frames_edge(mode='canny'):
+    global camera, streaming
+    last_spoken_time = time.time()
+    min_speak_interval = 3  
+
+    while streaming:
+        success, frame = camera.read()
+        if not success:
+            break
+
+        
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        
+        if mode == 'canny':
+            
+            edges = cv2.Canny(gray, 50, 150)
+        elif mode == 'sobel':
+            
+            grad_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3)
+            grad_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3)
+            magnitude = cv2.magnitude(grad_x, grad_y)
+            edges = cv2.convertScaleAbs(magnitude)
+        elif mode == 'log':
+           
+            laplacian = cv2.Laplacian(gray, cv2.CV_64F)
+            laplacian = np.absolute(laplacian)
+            edges = cv2.convertScaleAbs(laplacian)
+
+        
+        edges_colored = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
+
+       
+        results = model(frame)
+        nearest_object = None
+        min_distance = float('inf')
+
+        for result in results:
+            for box in result.boxes:
+                x1, y1, x2, y2 = map(int, box.xyxy[0])
+                pixel_width = x2 - x1
+                distance = estimate_distance(KNOWN_WIDTH, FOCAL_LENGTH, pixel_width)
+                class_id = int(box.cls[0])
+                class_name = model.names[class_id]
+
+               
+                if distance < min_distance and distance > 0:
+                    min_distance = distance
+                    nearest_object = (class_name, x1, y1, x2, y2)
+
+                
+                cv2.rectangle(edges_colored, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.putText(edges_colored, f"{class_name}: {distance:.2f} cm", (x1, y1 - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+
+        
+        if nearest_object and (time.time() - last_spoken_time > min_speak_interval):
+            class_name, x1, y1, x2, y2 = nearest_object
+            spoken_text = f"{class_name} detected at {int(min_distance)} centimeters"
+            speak(spoken_text, LANGUAGE_MAP[SELECTED_LANGUAGE])
+            last_spoken_time = time.time()
+
+        
+        ret, buffer = cv2.imencode('.jpg', edges_colored)
+        frame = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
 @app.route('/start_feed')
 def start_feed():
     global camera, streaming
     if not streaming:
-        camera = cv2.VideoCapture(0)  # Start webcam
+        camera = cv2.VideoCapture(0)  
         streaming = True
     return jsonify({"status": "started"})
 
@@ -97,7 +223,7 @@ def stop_feed():
     if streaming:
         streaming = False
         if camera is not None:
-            camera.release()  # Release webcam
+            camera.release()  
             camera = None
     return jsonify({"status": "stopped"})
 
@@ -108,5 +234,36 @@ def video_feed():
         return jsonify({"error": "Feed not started"}), 400
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@app.route('/video_feed_night')
+def video_feed_night():
+    mode = request.args.get('mode', default='clahe', type=str)  
+    global streaming
+    if not streaming:
+        return jsonify({"error": "Feed not started"}), 400
+    return Response(generate_frames_night(mode), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/video_feed_edge')
+def video_feed_edge():
+    global streaming
+   
+    mode = request.args.get('mode', default='canny', type=str)
+
+    if not streaming:
+        return jsonify({"error": "Feed not started"}), 400
+    
+    
+    return Response(generate_frames_edge(mode), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/start_edge_detection')
+def start_edge_detection():
+    global camera, streaming
+    if not streaming:
+        camera = cv2.VideoCapture(0)  
+        streaming = True
+    return jsonify({"status": "started"})
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+ 

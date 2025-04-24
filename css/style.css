@@ -11,8 +11,8 @@ header{
 	min-height: 100px;
 }
 .main {
-    position: relative; /* Ensure it stays above other elements */
-    z-index: 1000; /* Higher value brings it to the front */
+    position: relative; 
+    z-index: 1000; 
 }
 
 ul{
