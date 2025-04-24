@@ -26,14 +26,9 @@ Image Processing: OpenCV
 Text-to-Speech: gTTS (Google Text-to-Speech)
 PDF Generation: FPDF
 Camera Feed: OpenCV VideoCapture
+
 📦 Installation
 
-Clone the Repository
-git clone https://github.com/yourusername/anecdote-ai.git
-cd anecdote-ai
-Create a Virtual Environment (Optional but Recommended)
-python3 -m venv venv
-source venv/bin/activate
 Install Dependencies
 pip install -r requirements.txt
 Download/Place YOLOv8 Model Weights
